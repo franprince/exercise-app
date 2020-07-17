@@ -63,11 +63,11 @@ app.post("/api/exercise/new-user", (req, res) => {
 });
 
 app.get("/api/exercise/users", (req, res) => {
-  User.find({}, "username _id", (err, result) => {
+  User.find({}, (err, result) => {
     if (err) {
       console.error(err);
     }
-    res.json(result);
+    res.json({ username: result.username, _id: result._id });
   });
 });
 
@@ -80,7 +80,7 @@ app.get("/api/exercise/remove", (req, res) => {
   });
 });
 
-app.get("/api/exercise/log/", (req, res) => {
+app.get("/api/exercise/log", (req, res) => {
   const queryUserId = req.query.userId;
   const queryFrom = new Date(req.query.from);
   const queryTo = new Date(req.query.to);
@@ -97,16 +97,21 @@ app.get("/api/exercise/log/", (req, res) => {
     if (err) {
       console.error(err);
     }
-    Exercise.find(findQuery(queryUserId, queryFrom, queryTo), "-_id -userId")
+    Exercise.find(findQuery(queryUserId, queryFrom, queryTo))
       .limit(Number(queryLimit))
       .exec((err, listaEjecicios) => {
         if (err) {
           console.error(err);
         }
         res.json({
-          ...userInfo["_doc"],
+          _id: queryUserId,
+          username: userInfo.username,
           count: listaEjecicios.length,
-          log: listaEjecicios,
+          log: listaEjecicios.map((ejercicio) => ({
+            description: ejercicio.description,
+            duration: ejercicio.duration,
+            date: ejercicio.date.toDateString(),
+          })),
         });
       });
   });
