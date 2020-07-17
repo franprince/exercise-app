@@ -121,7 +121,7 @@ app.post("/api/exercise/add", (req, res) => {
     console.log(date);
     console.log(new Date(date));
     if (date.length) {
-      if (Date(date) == "Invalid Date") {
+      if (new Date(date) == "Invalid Date") {
         return new Date();
       } else {
         return new Date(date);
