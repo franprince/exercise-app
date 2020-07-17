@@ -1,0 +1,152 @@
+const express = require("express");
+const app = express();
+const bodyParser = require("body-parser");
+
+const cors = require("cors");
+
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+
+const uri =
+  "mongodb+srv://freecodecamp:ICN4xUb82gDjesq1@cluster0-stpfb.mongodb.net/fran?retryWrites=true&w=majority";
+
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+});
+
+const userSchema = new Schema({
+  name: { type: String, required: true },
+});
+const exerciseSchema = new Schema({
+  userId: { type: String, required: true },
+  description: { type: String, required: true },
+  duration: { type: Number, required: true },
+  date: { type: Date },
+});
+var User = mongoose.model("User", userSchema);
+
+var Exercise = mongoose.model("Exercise", exerciseSchema);
+
+app.use(cors());
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.use(express.static("public"));
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/views/index.html");
+});
+
+app.post("/api/exercise/new-user", (req, res) => {
+  const userName = req.body.username;
+  console.log(`El nombre de usuario es ${userName}`);
+  User.find({ name: userName }, "name", (err, result) => {
+    if (result.length) {
+      res.send("El usuario ya existe!" + result);
+    } else if (err) {
+      console.err("Error!: " + err);
+    } else {
+      const newUser = new User({
+        name: userName,
+      });
+      newUser.save((err, result) => {
+        if (err) {
+          console.error(err);
+        }
+        console.log(result);
+        res.send(result);
+      });
+    }
+  });
+});
+
+app.get("/api/exercise/users", (req, res) => {
+  User.find({}, "name _id", (err, result) => {
+    if (err) {
+      console.error(err);
+    }
+    res.json(result);
+  });
+});
+
+app.get("/api/exercise/remove", (req, res) => {
+  Exercise.deleteMany({}, (err, res) => {
+    if (err) {
+      console.error(err);
+    }
+    res.json(res);
+  });
+});
+
+app.get("/api/exercise/log/", (req, res) => {
+  const queryUserId = req.query.userId;
+  const queryFrom = new Date(req.query.from);
+  const queryTo = new Date(req.query.to);
+  const queryLimit = req.query.limit;
+
+  const findQuery = (queryUserId, queryFrom, queryTo) => {
+    if (queryTo == "Invalid Date" || queryFrom == "Invalid Date") {
+      return { userId: queryUserId };
+    } else {
+      return { userId: queryUserId, date: { $gte: queryFrom, $lt: queryTo } };
+    }
+  };
+  User.findById(queryUserId, "name", (err, userInfo) => {
+    if (err) {
+      console.error(err);
+    }
+    Exercise.find(findQuery(queryUserId, queryFrom, queryTo), "-_id -userId")
+      .limit(Number(queryLimit))
+      .exec((err, listaEjecicios) => {
+        if (err) {
+          console.error(err);
+        }
+        res.json({
+          ...userInfo["_doc"],
+          count: listaEjecicios.length,
+          log: listaEjecicios,
+        });
+      });
+  });
+});
+
+app.post("/api/exercise/add", (req, res) => {
+  const userId = req.body.userId;
+  const description = req.body.description;
+  const duration = req.body.duration;
+  const date = req.body.date;
+  const createDate = (date) => {
+    console.log(date);
+    console.log(new Date(date));
+    if (date.length) {
+      if (Date(date) === "Invalid Date") {
+        return new Date();
+      } else {
+        return new Date(date);
+      }
+    } else {
+      return new Date();
+    }
+  };
+
+  const newExercise = new Exercise({
+    userId: userId,
+    description: description,
+    duration: duration,
+    date: createDate(date),
+  });
+
+  newExercise.save((err, result) => {
+    if (err) {
+      console.error(err);
+    }
+    console.log(result);
+    res.send(result);
+  });
+});
+
+const listener = app.listen(process.env.PORT || 3000, () => {
+  console.log("Your app is listening on port " + listener.address().port);
+});
