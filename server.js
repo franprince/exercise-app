@@ -67,7 +67,7 @@ app.get("/api/exercise/users", (req, res) => {
     if (err) {
       console.error(err);
     }
-    res.json({ username: result.username, _id: result._id });
+    res.json(result);
   });
 });
 
