@@ -148,7 +148,7 @@ app.post("/api/exercise/add", (req, res) => {
       console.error(err);
     }
     console.log(result);
-    res.send(result);
+    res.json(result);
   });
 });
 
