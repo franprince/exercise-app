@@ -17,7 +17,7 @@ mongoose.connect(uri, {
 });
 
 const userSchema = new Schema({
-  name: { type: String, required: true },
+  username: { type: String, required: true },
 });
 const exerciseSchema = new Schema({
   userId: { type: String, required: true },
@@ -42,14 +42,14 @@ app.get("/", (req, res) => {
 app.post("/api/exercise/new-user", (req, res) => {
   const userName = req.body.username;
   console.log(`El nombre de usuario es ${userName}`);
-  User.find({ name: userName }, "name", (err, result) => {
+  User.find({ username: userName }, "username", (err, result) => {
     if (result.length) {
       res.send("El usuario ya existe!" + result);
     } else if (err) {
       console.err("Error!: " + err);
     } else {
       const newUser = new User({
-        name: userName,
+        username: userName,
       });
       newUser.save((err, result) => {
         if (err) {
@@ -63,7 +63,7 @@ app.post("/api/exercise/new-user", (req, res) => {
 });
 
 app.get("/api/exercise/users", (req, res) => {
-  User.find({}, "name _id", (err, result) => {
+  User.find({}, "username _id", (err, result) => {
     if (err) {
       console.error(err);
     }
@@ -72,11 +72,11 @@ app.get("/api/exercise/users", (req, res) => {
 });
 
 app.get("/api/exercise/remove", (req, res) => {
-  Exercise.deleteMany({}, (err, res) => {
+  Exercise.deleteMany({}, (err, response) => {
     if (err) {
       console.error(err);
     }
-    res.json(res);
+    res.json(response);
   });
 });
 
@@ -93,7 +93,7 @@ app.get("/api/exercise/log/", (req, res) => {
       return { userId: queryUserId, date: { $gte: queryFrom, $lt: queryTo } };
     }
   };
-  User.findById(queryUserId, "name", (err, userInfo) => {
+  User.findById(queryUserId, "username", (err, userInfo) => {
     if (err) {
       console.error(err);
     }
