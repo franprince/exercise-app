@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
 
 app.post("/api/exercise/new-user", (req, res) => {
   const userName = req.body.username;
-  console.log(`El nombre de usuario es ${userName}`);
+  console.log(req.body);
   User.find({ username: userName }, "username", (err, result) => {
     if (result.length) {
       res.send("El usuario ya existe!" + result);
@@ -85,7 +85,7 @@ app.get("/api/exercise/log", (req, res) => {
   const queryFrom = new Date(req.query.from);
   const queryTo = new Date(req.query.to);
   const queryLimit = req.query.limit;
-
+  console.log(req.body);
   const findQuery = (queryUserId, queryFrom, queryTo) => {
     if (queryTo == "Invalid Date" || queryFrom == "Invalid Date") {
       return { userId: queryUserId };
@@ -95,7 +95,7 @@ app.get("/api/exercise/log", (req, res) => {
   };
   User.findById(queryUserId, "username", (err, userInfo) => {
     if (err) {
-      console.error(err);
+      console.error("Error: " + err);
     }
     Exercise.find(findQuery(queryUserId, queryFrom, queryTo))
       .limit(Number(queryLimit))
@@ -123,8 +123,7 @@ app.post("/api/exercise/add", (req, res) => {
   const duration = req.body.duration;
   const date = req.body.date;
   const createDate = (date) => {
-    console.log(date);
-    console.log(new Date(date));
+    console.log(req.body);
     if (date.length) {
       if (new Date(date) == "Invalid Date") {
         return new Date();
@@ -150,6 +149,11 @@ app.post("/api/exercise/add", (req, res) => {
     console.log(result);
     res.json(result);
   });
+});
+
+process.on("unhandledRejection", (reason, p) => {
+  console.log("Unhandled Rejection at: Promise", p, "reason:", reason);
+  // application specific logging, throwing an error, or other logic here
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
