@@ -157,7 +157,7 @@ app.post("/api/exercise/add", (req, res) => {
       res.json({
         _id: exerciseInfo._id,
         username: userInfo.username,
-        date: exerciseInfo.date.toUTCString().split(" ").slice(0, 4).join(" "),
+        date: exerciseInfo.date.toDateString(),
         duration: exerciseInfo.duration,
         description: exerciseInfo.description,
       });
