@@ -157,17 +157,13 @@ app.post("/api/exercise/add", (req, res) => {
       res.json({
         _id: exerciseInfo._id,
         username: userInfo.username,
-        date: exerciseInfo.date.toDateString(),
+
+        date: new Date(exerciseInfo.date).toDateString(),
         duration: exerciseInfo.duration,
         description: exerciseInfo.description,
       });
     });
   });
-});
-
-process.on("unhandledRejection", (reason, p) => {
-  console.log("Unhandled Rejection at: Promise", p, "reason:", reason);
-  // application specific logging, throwing an error, or other logic here
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
