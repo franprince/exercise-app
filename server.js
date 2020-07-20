@@ -142,12 +142,22 @@ app.post("/api/exercise/add", (req, res) => {
     date: createDate(date),
   });
 
-  newExercise.save((err, result) => {
+  newExercise.save((err, exerciseInfo) => {
     if (err) {
       console.error(err);
     }
-    console.log(result);
-    res.json(result);
+    User.findById(exerciseInfo.userId, (err, userInfo) => {
+      if (err) {
+        console.error(err);
+      }
+      res.json({
+        _id: exerciseInfo._id,
+        username: userInfo.username,
+        date: exerciseInfo.date.toUTCString(),
+        duration: exerciseInfo.duration,
+        description: exerciseInfo.description,
+      });
+    });
   });
 });
 
