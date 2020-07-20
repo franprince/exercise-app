@@ -7,8 +7,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const uri =
-  "mongodb+srv://freecodecamp:ICN4xUb82gDjesq1@cluster0-stpfb.mongodb.net/fran?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PWD}@cluster0-stpfb.mongodb.net/fran?retryWrites=true&w=majority`;
 
 mongoose.connect(uri, {
   useNewUrlParser: true,
