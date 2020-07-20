@@ -124,7 +124,7 @@ app.post("/api/exercise/add", (req, res) => {
   const date = req.body.date;
   const createDate = (date) => {
     console.log(req.body);
-    if (date.length) {
+    if (!undefined && date.length) {
       if (new Date(date) == "Invalid Date") {
         return new Date();
       } else {
