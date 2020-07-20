@@ -131,7 +131,11 @@ app.post("/api/exercise/add", (req, res) => {
         return new Date(date);
       }
     } else {
-      return new Date();
+      return new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        new Date().getDate()
+      );
     }
   };
 
@@ -153,7 +157,7 @@ app.post("/api/exercise/add", (req, res) => {
       res.json({
         _id: exerciseInfo._id,
         username: userInfo.username,
-        date: exerciseInfo.date.toUTCString(),
+        date: exerciseInfo.date.toUTCString().split(" ").slice(0, 4).join(" "),
         duration: exerciseInfo.duration,
         description: exerciseInfo.description,
       });
